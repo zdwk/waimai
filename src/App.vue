@@ -7,13 +7,19 @@
 
 <script>
 import FooterGuide from './components/FooterGuide/FooterGuide'
+import { mapActions } from 'vuex'
 export default {
   components: {
     FooterGuide
+  },
+  mounted () {
+    this.getAddress()
+  },
+  methods: {
+    ...mapActions(['getAddress'])
   }
 }
 </script>
 
 <style lang="stylus" scoped>
 </style>
-

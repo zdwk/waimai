@@ -4,24 +4,34 @@
       <div class="login_header">
         <h2 class="login_logo">硅谷外卖</h2>
         <div class="login_header_title">
-          <a href="javascript:;"
-             class="on">短信登录</a>
-          <a href="javascript:;">密码登录</a>
+          <a @click="loginWay = true"
+             href="javascript:;"
+             :class="{on: loginWay}">短信登录</a>
+          <a @click="loginWay = false"
+             :class="{on: !loginWay}"
+             href="javascript:;">密码登录</a>
         </div>
       </div>
       <div class="login_content">
-        <form>
-          <div class="on">
+        <!-- 将表单的 form 提交改为触发 getLogin -->
+        <form @submit.prevent="getLogin">
+          <div :class="{on: loginWay}">
             <section class="login_message">
-              <input type="tel"
+              <input v-model="phone"
+                     type="tel"
                      maxlength="11"
                      placeholder="手机号">
-              <button disabled="disabled"
-                      class="get_verification">获取验证码</button>
+              <button :disabled="!rightPhone"
+                      class="get_verification"
+                      :class="{right_phone: rightPhone}"
+                      @click.prevent="getCode">
+                {{ computeTime > 0 ? `已发送 (${computeTime}s)` : '获取验证码' }}
+              </button>
             </section>
             <section class="login_verification">
               <input type="tel"
                      maxlength="8"
+                     v-model="code"
                      placeholder="验证码">
             </section>
             <section class="login_hint">
@@ -29,26 +39,38 @@
               <a href="javascript:;">《用户服务协议》</a>
             </section>
           </div>
-          <div>
+          <div :class="{on: !loginWay}">
             <section>
               <section class="login_message">
-                <input type="tel"
+                <input type="text"
                        maxlength="11"
-                       placeholder="手机/邮箱/用户名">
+                       placeholder="手机/邮箱/用户名"
+                       v-model="name">
               </section>
               <section class="login_verification">
-                <input type="tel"
-                       maxlength="8"
+                <input v-if="showPwd"
+                       v-model="pwd"
+                       type="text"
+                       maxlength="11"
                        placeholder="密码">
-                <div class="switch_button off">
-                  <div class="switch_circle"></div>
-                  <span class="switch_text">...</span>
+                <input v-else
+                       v-model="pwd"
+                       type="password"
+                       maxlength="11"
+                       placeholder="密码">
+                <div @click="showPwd = !showPwd"
+                     class="switch_button"
+                     :class="showPwd ? 'on' : 'off'">
+                  <div class="switch_circle"
+                       :class="{right: showPwd}"></div>
+                  <span class="switch_text">{{ showPwd ? 'abc' : '...' }}</span>
                 </div>
               </section>
               <section class="login_message">
                 <input type="text"
                        maxlength="11"
-                       placeholder="验证码">
+                       placeholder="验证码"
+                       v-model="captcha">
                 <img class="get_verification"
                      src="./images/captcha.svg"
                      alt="captcha">
@@ -66,9 +88,97 @@
         <i class="iconfont icon-jiantou2"></i>
       </a>
     </div>
+
+    <AlertTip :alertText="alertText"
+              v-show="showAlert"
+              @closeTip="closeTip" />
+
   </section>
 
 </template>
+<script>
+import AlertTip from '../../components/AlertTip/AlertTip'
+export default {
+  data () {
+    return {
+      loginWay: true, // true 代表短信登录。false 代表账号密码登录
+      phone: '',  // 手机号
+      computeTime: 0, // 计时的时间
+      showPwd: false, // 是否显示密码
+      code: '',   // 短信验证码
+      name: '',   // 手机/邮箱/用户名
+      pwd: '',    // 密码
+      captcha: '',  // 图形验证码
+      alertText: '',  // 提示字符串
+      showAlert: false, // 是否显示提示框
+    }
+  },
+  computed: {
+    rightPhone () {
+      return /^1\d{10}$/.test(this.phone)
+    }
+  },
+  components: {
+    AlertTip
+  },
+  methods: {
+    // 异步获取短信验证码
+    getCode () {
+      // 如果当前没有计时
+      if (!this.computeTime) {
+        // 启动倒计时
+        this.computeTime = 30
+        const intervalId = setInterval(() => {
+          this.computeTime--
+          if (this.computeTime <= 0) {
+            // 关闭定时器
+            clearInterval(intervalId)
+          }
+        }, 1000)
+        // 发动 ajax 请求(向指定手机号发送验证码短信)
+      }
+    },
+    // 显示提示框
+    showAlertBox (alertText) {
+      this.showAlert = true
+      this.alertText = alertText
+    },
+    // 关闭提示框
+    closeTip () {
+      this.showAlert = false
+      this.alertText = ''
+    },
+    // 异步登录
+    getLogin () {
+      // 前台表单验证
+      if (this.loginWay) {
+        // 短信登录
+        const { rightPhone, phone, code } = this
+        if (!this.rightPhone) {
+          // 手机号不正确
+          this.showAlertBox('手机号不正确')
+        } else if (!/^\d{6}$/.test(code)) {
+          // 正则判断短信验证码是否是 6 位数字
+          this.showAlertBox('验证码不正确')
+        }
+      } else {
+        // 密码登录
+        const { name, pwd, captcha } = this
+        if (!this.name) {
+          // 请填写用户名
+          this.showAlertBox('请填写用户名')
+        } else if (!this.pwd) {
+          // 请填写密码
+          this.showAlertBox('请填写密码')
+        } else if (!this.captcha) {
+          // 请填写验证码
+          this.showAlertBox('请填写验证码')
+        }
+      }
+    }
+  }
+}
+</script>
 
 <style lang="stylus" scoped>
 @import '../../common/stylus/mixins.styl'
@@ -132,6 +242,8 @@
               color #ccc
               font-size 14px
               background transparent
+              &.right_phone
+                color black
           .login_verification
             position relative
             margin-top 16px
@@ -171,6 +283,8 @@
                 background #fff
                 box-shadow 0 2px 4px 0 rgba(0, 0, 0, 0.1)
                 transition transform 0.3s
+                &.right
+                  transform translateX(30px)
           .login_hint
             margin-top 12px
             color #999
