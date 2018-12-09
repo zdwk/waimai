@@ -39,6 +39,27 @@ export default new Router({
     {
       path: '/login',
       component: r => require.ensure([], () => r(require('@/pages/Login/Login')), 'Login')
+    },
+    {
+      path: '/shop',
+      component: r => require.ensure([], () => r(require('@/pages/Shop/Shop')), 'Shop'),
+      children: [{ // 子路由
+          path: '/shop/goods',
+          component: r => require.ensure([], () => r(require('@/pages/Shop/ShopGoods/ShopGoods')), 'ShopGoods')
+        },
+        {
+          path: '/shop/ratings',
+          component: r => require.ensure([], () => r(require('@/pages/Shop/ShopRatings/ShopRatings')), 'ShopRatings')
+        },
+        {
+          path: '/shop/info',
+          component: r => require.ensure([], () => r(require('@/pages/Shop/ShopInfo/ShopInfo')), 'ShopInfo')
+        },
+        { // 默认显示 goods
+          path: '',
+          redirect: '/shop/goods'
+        }
+      ]
     }
 
   ]

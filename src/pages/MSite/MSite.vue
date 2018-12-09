@@ -2,15 +2,23 @@
   <section class="msite">
     <!--首页头部-->
     <HeaderTop :title="address.name">
-      <span slot="left"
-            class="header_search">
+      <router-link tag="span"
+                   to="/search"
+                   slot="left"
+                   class="header_search">
         <i class="iconfont icon-sousuo"></i>
-      </span>
+      </router-link>
 
-      <span slot="right"
-            class="header_login">
-        <span class="header_login_text">登录|注册</span>
-      </span>
+      <router-link tag="span"
+                   :to="userInfo._id ? 'userInfo' : '/login'"
+                   slot="right"
+                   class="header_login">
+        <span class="header_login_text">
+          <span v-if="!userInfo._id ">登录|注册</span>
+          <i v-else
+             class="iconfont icon-person"></i>
+        </span>
+      </router-link>
 
     </HeaderTop>
     <!--首页导航-->
@@ -79,7 +87,7 @@ export default {
     this.getShops()
   },
   computed: {
-    ...mapState(['address', 'categorys']),
+    ...mapState(['address', 'categorys', 'userInfo']),
     categorysArr () {
       // console.log(this)
       // 根据 categorys 一维数组生成一个二维数组，小数组中的元素个数最大是 8
@@ -122,6 +130,9 @@ export default {
 <style lang="stylus" scoped>
 @import 'swiper/dist/css/swiper.min.css'
 @import '../../common/stylus/mixins.styl'
+.icon-sousuo
+  font-size 20px
+  color #fff
 &.msite // 首页
   width 100%
   overflow hidden

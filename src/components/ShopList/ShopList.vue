@@ -4,7 +4,8 @@
         class="shop_list">
       <li v-for="(item, i) in shops"
           :key="i"
-          class="shop_li border-1px">
+          class="shop_li border-1px"
+          @click="$router.push('/shop')">
         <a>
           <div class="shop_left">
             <img class="shop_img"
