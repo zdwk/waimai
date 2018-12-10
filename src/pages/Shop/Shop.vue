@@ -3,13 +3,19 @@
     <ShopHeader />
     <div class="tab">
       <div class="tab-item">
-        <router-link to="/shop/goods">点餐</router-link>
+        <a @click.prevent="goToLink('/shop/goods')"
+           :class="{'router-link-active': $route.path === '/shop/goods'}"
+           href="">点餐</a>
       </div>
       <div class="tab-item">
-        <router-link to="/shop/ratings">评价</router-link>
+        <a @click.prevent="goToLink('/shop/ratings')"
+           :class="{'router-link-active': $route.path === '/shop/ratings'}"
+           href="">评价</a>
       </div>
       <div class="tab-item">
-        <router-link to="/shop/info">商家信息</router-link>
+        <a @click.prevent="goToLink('/shop/info')"
+           :class="{'router-link-active': $route.path === '/shop/info'}"
+           href="">商家信息</a>
       </div>
     </div>
     <router-view />
@@ -21,10 +27,13 @@ import ShopHeader from '../../components/ShopHeader/ShopHeader'
 import { mapActions } from 'vuex'
 export default {
   mounted () {
-    this.getShopGoods()
+    this.getShopInfo()
   },
   methods: {
-    ...mapActions(['getShopGoods'])
+    ...mapActions(['getShopInfo']),
+    goToLink (url) {
+      this.$router.replace(url)
+    }
   },
   components: {
     ShopHeader
