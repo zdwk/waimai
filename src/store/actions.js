@@ -101,10 +101,12 @@ export default {
   // 异步获取商品列表
   async getShopGoods({
     commit
-  }) {
+  }, callback) {
     const result = await reqShopGoods()
     if (result.code === 0) {
       commit(RECEIVE_GOODS, result.data)
+      // 数据更新，通知组件数据已改变
+      callback && callback()
     }
   },
   // 异步获取商家评价
@@ -119,10 +121,11 @@ export default {
   // 异步获取商家信息
   async getShopInfo({
     commit
-  }) {
+  }, callback) {
     const result = await reqShopInfo()
     if (result.code === 0) {
       commit(RECEIVE_INFO, result.data)
     }
   }
+
 }

@@ -7,7 +7,8 @@
         <i class="iconfont icon-arrow_left"></i>
       </a>
     </nav>
-    <div class="shop-content">
+    <div class="shop-content"
+         @click="toggleShopShow">
       <img class="content-image"
            :src="info.avatar">
       <div class="header-content">
@@ -30,7 +31,8 @@
       </div>
     </div>
     <div class="shop-header-discounts"
-         v-if="info.supports">
+         v-if="info.supports"
+         @click="toggleSupportShow">
       <div class="discounts-left">
         <div class="activity"
              :class="supportClasses[info.supports[0].type]">
@@ -44,60 +46,67 @@
         {{ info.supports.length }} 个优惠
       </div>
     </div>
-    <div class="shop-brief-modal"
-         style="display:none">
-      <div class="brief-modal-content">
-        <h2 class="content-title">
-          <span class="content-tag">
-            <span class="mini-tag">品牌</span>
-          </span>
-          <span class="content-name">嘉禾一品（温都水城） </span>
-        </h2>
-        <ul class="brief-modal-msg">
-          <li>
-            <h3>3.5</h3>
-            <p>评分</p>
-          </li>
-          <li>
-            <h3>90 单</h3>
-            <p>月售</p>
-          </li>
-          <li>
-            <h3>硅谷专送</h3>
-            <p>约 28 分钟</p>
-          </li>
-          <li>
-            <h3>4 元</h3>
-            <p>配送费用</p>
-          </li>
-          <li>
-            <h3>1000m</h3>
-            <p>距离</p>
-          </li>
-        </ul>
-        <h3 class="brief-modal-title"><span>公告</span></h3>
-        <div class="brief-modal-notice">
-          是以粥为特色的中式营养快餐， 自 2004 年 10 月 18 日创立“嘉和一品”品牌至今
+    <transition name="fade">
+      <div class="shop-brief-modal"
+           v-show="shopShow">
+        <div class="brief-modal-content">
+          <h2 class="content-title">
+            <span class="content-tag">
+              <span class="mini-tag">品牌</span>
+            </span>
+            <span class="content-name">{{ info.name }}</span>
+          </h2>
+          <ul class="brief-modal-msg">
+            <li>
+              <h3>{{ info.score }}</h3>
+              <p>评分</p>
+            </li>
+            <li>
+              <h3>{{ info.sellCount }} 单</h3>
+              <p>月售</p>
+            </li>
+            <li>
+              <h3>{{ info.description }}</h3>
+              <p>约 {{ info.deliveryTime }} 分钟</p>
+            </li>
+            <li>
+              <h3>{{ info.deliveryPrice }} 元</h3>
+              <p>配送费用</p>
+            </li>
+            <li>
+              <h3>{{ info.distance }}</h3>
+              <p>距离</p>
+            </li>
+          </ul>
+          <h3 class="brief-modal-title"><span>公告</span></h3>
+          <div class="brief-modal-notice">{{ info.bulletin }}</div>
+          <div @click="toggleShopShow"
+               class="mask-footer">
+            <span class="iconfont icon-close"></span>
+          </div>
         </div>
-        <div class="mask-footer">
-          <span class="iconfont icon-close"></span>
-        </div>
+        <div class="brief-modal-cover"></div>
       </div>
-      <div class="brief-modal-cover"></div>
-    </div>
+    </transition>
     <div class="activity-sheet"
-         style="display: none">
+         v-show="supportShow">
       <div class="activity-sheet-content">
         <h2 class="activity-sheet-title">优惠活动</h2>
         <ul class="list">
-          <li class="activity-item activity-green">
+
+          <li v-for="(item, i) in info.supports"
+              :key="i"
+              class="activity-item"
+              :class="supportClasses[item.type]">
             <span class="content-tag">
-              <span class="mini-tag">首单</span>
+              <span class="mini-tag">{{ item.name }}</span>
             </span>
-            <span class="activity-content">新用户下单立减 17 元(不与其它活动同享)</span>
+            <span class="activity-content">{{ item.content }}</span>
           </li>
+
         </ul>
-        <div class="activity-sheet-close">
+        <div class="activity-sheet-close"
+             @click="toggleSupportShow">
           <span class="iconfont icon-close"></span>
         </div>
       </div>
@@ -110,7 +119,17 @@ import { mapActions, mapState } from 'vuex'
 export default {
   data () {
     return {
-      supportClasses: ['activity-green', 'activity-red', 'activity-orange'], // 
+      supportClasses: ['activity-green', 'activity-red', 'activity-orange'],
+      shopShow: false,
+      supportShow: false,
+    }
+  },
+  methods: {
+    toggleShopShow () {
+      this.shopShow = !this.shopShow
+    },
+    toggleSupportShow () {
+      this.supportShow = !this.supportShow
     }
   },
   computed: {
