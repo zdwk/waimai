@@ -9,7 +9,11 @@ import {
   RESET_USER_INFO,
   RECEIVE_GOODS,
   RECEIVE_RATINGS,
-  RECEIVE_INFO
+  RECEIVE_INFO,
+  INCREMENT_FOOD_COUNT,
+  DECREMENT_FOOD_COUNT,
+  CLEAR_CART,
+  RECEIVE_SEARCH_SHOPS
 } from './mutation-tyoe'
 import {
   reqAddress,
@@ -19,7 +23,8 @@ import {
   reqLogout,
   reqShopGoods,
   reqShopRatings,
-  reqShopInfo
+  reqShopInfo,
+  reqSearchShop
 } from '../api'
 export default {
   // 异步获取地址
@@ -112,10 +117,11 @@ export default {
   // 异步获取商家评价
   async getShopRatings({
     commit
-  }) {
-    const result = await reqShopRatings
+  }, callback) {
+    const result = await reqShopRatings()
     if (result.code === 0) {
       commit(RECEIVE_RATINGS, result.data)
+      callback && callback()
     }
   },
   // 异步获取商家信息
@@ -125,6 +131,39 @@ export default {
     const result = await reqShopInfo()
     if (result.code === 0) {
       commit(RECEIVE_INFO, result.data)
+    }
+  },
+  // 同步 更新 food 中的 count 数量
+  updateFoodCount({
+    commit
+  }, {
+    isAdd,
+    food
+  }) {
+    if (isAdd) {
+      commit(INCREMENT_FOOD_COUNT, food)
+    } else {
+      commit(DECREMENT_FOOD_COUNT, food)
+    }
+  },
+  // 同步清空购物车
+  clearCart({
+    commit
+  }) {
+    commit(CLEAR_CART)
+  },
+  // 异步搜索商家列表
+  async searchShops({
+    commit,
+    state
+  }, keyword) {
+    const geohash = state.latitude + ',' + state.longitude
+    const result = await reqSearchShop(geohash, keyword)
+    if (result.code === 0) {
+      const searchShops = result.data
+      commit(RECEIVE_SEARCH_SHOPS, {
+        searchShops
+      })
     }
   }
 

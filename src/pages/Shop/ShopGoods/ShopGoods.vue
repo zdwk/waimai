@@ -27,7 +27,8 @@
             <ul>
               <li v-for="(food, i) in good.foods"
                   :key="i"
-                  class="food-item bottom-border-1px">
+                  class="food-item bottom-border-1px"
+                  @click="showFood(food)">
                 <div class="icon">
                   <img width="57"
                        height="57"
@@ -43,7 +44,7 @@
                     <span class="now">￥{{ food.price }}</span>
                   </div>
                   <div class="cartcontrol-wrapper">
-                    CartControl
+                    <CartControl :food="food" />
                   </div>
                 </div>
               </li>
@@ -51,10 +52,16 @@
           </li>
         </ul>
       </div>
+      <ShopCart />
     </div>
+    <Food :food="food"
+          ref="food" />
   </div>
 </template>
 <script>
+import CartControl from '../../../components/CartControl/CartControl'
+import ShopCart from '../../../components/ShopCart/ShopCart'
+import Food from '../../../components/Food/Food'
 import BScroll from 'better-scroll'
 import { mapActions, mapState } from 'vuex'
 export default {
@@ -62,6 +69,7 @@ export default {
     return {
       scrolly: 0,  // 右侧滑动的 Y 轴坐标（滑动过程实时变化）
       tops: [], // 所有右侧分类 li 的 top 组成的数组（列表第一次显示后就不在变化）
+      food: {}, // 需要显示的 food
     }
   },
   mounted () {
@@ -110,10 +118,22 @@ export default {
     },
     getMenuItem (index) {
       const y = this.tops[index]
+      // 立即更新 scrolly（让点击的分类想成为当前分类）
       this.scrolly = y
       // 使右侧列表滑动到对应的位置
       this.foodsScroll.scrollTo(0, -y, 300)
+    },
+    showFood (food) { // 显示点击的 food
+      // 设置 food
+      this.food = food
+      // 显示 food 组件（在父组件中调用子组件对象的方法）
+      this.$refs.food.toggleShow()
     }
+  },
+  components: {
+    CartControl,
+    Food,
+    ShopCart
   },
   computed: {
     ...mapState(['goods']),
