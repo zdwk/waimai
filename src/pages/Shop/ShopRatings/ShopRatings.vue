@@ -78,7 +78,7 @@
                       :key="i"
                       class="item">{{ item }}</span>
               </div>
-              <div class="time">{{ rating.rateTime }}</div>
+              <div class="time">{{ rating.rateTime | dataFormat }}</div>
             </div>
           </li>
         </ul>

@@ -3,22 +3,25 @@
     <ShopHeader />
     <div class="tab">
       <div class="tab-item">
-        <a @click.prevent="goToLink('/shop/goods')"
-           :class="{'router-link-active': $route.path === '/shop/goods'}"
-           href="">点餐</a>
+        <router-link to="/shop/goods"
+                     replace
+                     :class="{'router-link-active': $route.path === '/shop/goods'}">点餐</router-link>
       </div>
       <div class="tab-item">
-        <a @click.prevent="goToLink('/shop/ratings')"
-           :class="{'router-link-active': $route.path === '/shop/ratings'}"
-           href="">评价</a>
+        <router-link to="/shop/ratings"
+                     replace
+                     :class="{'router-link-active': $route.path === '/shop/ratings'}">评价</router-link>
       </div>
       <div class="tab-item">
-        <a @click.prevent="goToLink('/shop/info')"
-           :class="{'router-link-active': $route.path === '/shop/info'}"
-           href="">商家信息</a>
+        <router-link to="/shop/info"
+                     replace
+                     :class="{'router-link-active': $route.path === '/shop/info'}">商家信息</router-link>
       </div>
     </div>
-    <router-view />
+    <!-- keep-alive 缓存路由 -->
+    <keep-alive>
+      <router-view />
+    </keep-alive>
   </div>
 </template>
 
@@ -30,10 +33,7 @@ export default {
     this.getShopInfo()
   },
   methods: {
-    ...mapActions(['getShopInfo']),
-    goToLink (url) {
-      this.$router.replace(url)
-    }
+    ...mapActions(['getShopInfo'])
   },
   components: {
     ShopHeader

@@ -10,65 +10,73 @@
       <input type="submit"
              class="search_submit">
     </form>
-    <section class="list">
+    <section v-if="!noSelectShops"
+             class="list">
       <ul class="list_container">
-        <li class="list_li">
+        <router-link :to="{ path: '/shop', query: { id: item.id } }"
+                     tag="li"
+                     v-for="(item, i) in searchShops"
+                     :key="i"
+                     class="list_li">
           <section class="item_left">
-            <img src="http://cangdu.org:8001/img/16265a70fe27854.jpg"
+            <img :src="imgBaseUrl + item.image_path"
                  class="restaurant_img">
           </section>
           <section class="item_right">
             <div class="item_right_text">
               <p>
-                <span>aaa</span>
+                <span>{{ item.name }}</span>
               </p>
-              <p>月售 671 单</p>
-              <p>20 元起送 / 距离 1058.2 公里</p>
+              <p>月售 {{ item.recent_order_num }} 单</p>
+              <p>{{ item.float_minimum_order_amount }} 元起送 / 距离 {{ item.distance }}</p>
             </div>
           </section>
-        </li>
-        <li class="list_li">
-          <section class="item_left">
-            <img src="http://cangdu.org:8001/img/16265a70fe27854.jpg"
-                 class="restaurant_img">
-          </section>
-          <section class="item_right">
-            <div class="item_right_text">
-              <p>
-                <span>aaa</span>
-              </p>
-              <p>月售 671 单</p>
-              <p>20 元起送 / 距离 1058.2 公里</p>
-            </div>
-          </section>
-        </li>
+        </router-link>
       </ul>
     </section>
+    <div v-else
+         class="search_none">很抱歉！无搜索结果</div>
   </section>
 </template>
 
 <script>
-import Toast from 'mint-ui'
+import { Toast } from 'mint-ui'
 import HeaderTop from '../../components/HeaderTop/HeaderTop'
-import { mapActions } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 export default {
   data () {
     return {
-      keyword: ''
+      keyword: '',
+      imgBaseUrl: 'http://cangdu.org:8001/img/',
+      noSelectShops: false
     }
   },
+  computed: {
+    ...mapState(['searchShops'])
+  },
   methods: {
-    ...mapActions(['searchShops']),
+    ...mapActions(['searchShopsFn']),
     getSearch () {
       const keyword = this.keyword.trim()
-      if (!keyword) {
+      if (keyword) {
+        this.searchShopsFn(keyword)
+      } else {
         Toast('请输入商家名称')
       }
-      this.searchShops(keyword)
+
     }
   },
   components: {
     HeaderTop
+  },
+  watch: {
+    searchShops (value) {
+      if (!value.length) {
+        this.noSelectShops = true
+      } else {
+        this.noSelectShops = false
+      }
+    }
   }
 }
 </script>

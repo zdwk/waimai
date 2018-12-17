@@ -153,7 +153,7 @@ export default {
     commit(CLEAR_CART)
   },
   // 异步搜索商家列表
-  async searchShops({
+  async searchShopsFn({
     commit,
     state
   }, keyword) {
@@ -161,9 +161,7 @@ export default {
     const result = await reqSearchShop(geohash, keyword)
     if (result.code === 0) {
       const searchShops = result.data
-      commit(RECEIVE_SEARCH_SHOPS, {
-        searchShops
-      })
+      commit(RECEIVE_SEARCH_SHOPS, searchShops)
     }
   }
 
